@@ -25,7 +25,7 @@ contract CRC2 {
 
 ### API
 
-CRC2 requires contract to implement the `CRC2Receiver` interface in order to receive tokens. If a user tries to send CRC2 tokens to a non-receiver contract the function will throw in the same way that it would if you sent ether to a contract without the called function being `payable`.
+CRC2 requires contract to implement the `CRC2Receiver` interface in order to receive tokens. If a user tries to send CRC2 tokens to a non-receiver contract the function will throw in the same way that it would if you sent core to a contract without the called function being `payable`.
 
 An example of the high-level API for a receiver contract is:
 
@@ -43,7 +43,7 @@ contract ExampleReceiver is StandardReceiver {
 }
 ```
 
-Where functions that have the `tokenPayable` can only be called via a token fallback and inside the functions you have access to the `tkn` struct that tries to mimic the `msg` struct used for ether calls.
+Where functions that have the `tokenPayable` can only be called via a token fallback and inside the functions you have access to the `tkn` struct that tries to mimic the `msg` struct used for core calls.
 
 The function `foo()` will be called when a user transfers CRC2 tokens to the receiver address.
 
@@ -66,7 +66,7 @@ The current `tkn` values are:
   - For `transferFrom()`, it will be the address that created the allowance in the token contract
 
 - `tkn.value` the amount of tokens sent
-- `tkn.data` arbitrary data sent with the token transfer. Simulates ether `tx.data`.
+- `tkn.data` arbitrary data sent with the token transfer. Simulates core `tx.data`.
 - `tkn.sig` the first 4 bytes of `tx.data` that determine what function is called.
 
 ### The main goals of developing CRC2 token standard were:
@@ -81,7 +81,7 @@ The current `tkn` values are:
   3. Allows contract developers to handle incoming token transactions.
   4. CRC2 `transfer` to contract consumes 2 times less gas than CRC1 `approve` and `transferFrom` at receiver contract.
   5. Allows to deposit tokens intor contract with a single transaction. Prevents extra blockchain bloating.
-  6. Makes token transactions similar to Ether transactions.
+  6. Makes token transactions similar to Core transactions.
 
   CRC2 tokens are backwards compatible with CRC1 tokens. It means that CRC2 supports every CRC1 functional and contracts or services working with CRC1 tokens will work with CRC2 tokens correctly.
-CRC2 tokens should be sent by calling `transfer` function on token contract with no difference is receiver a contract or a wallet address. If the receiver is a wallet CRC2 token transfer will be same to CRC1 transfer. If the receiver is a contract CRC2 token contract will try to call `tokenFallback` function on receiver contract. If there is no `tokenFallback` function on receiver contract transaction will fail. `tokenFallback` function is analogue of `fallback` function for Core transactions. It can be used to handle incoming transactions. There is a way to attach `bytes _data` to token transaction similar to `_data` attached to Ether transactions. It will pass through token contract and will be handled by `tokenFallback` function on receiver contract. There is also a way to call `transfer` function on CRC2 token contract with no data argument or using CRC1 ABI with no data on `transfer` function. In this case `_data` will be empty bytes array.
+CRC2 tokens should be sent by calling `transfer` function on token contract with no difference is receiver a contract or a wallet address. If the receiver is a wallet CRC2 token transfer will be same to CRC1 transfer. If the receiver is a contract CRC2 token contract will try to call `tokenFallback` function on receiver contract. If there is no `tokenFallback` function on receiver contract transaction will fail. `tokenFallback` function is analogue of `fallback` function for Core transactions. It can be used to handle incoming transactions. There is a way to attach `bytes _data` to token transaction similar to `_data` attached to Core transactions. It will pass through token contract and will be handled by `tokenFallback` function on receiver contract. There is also a way to call `transfer` function on CRC2 token contract with no data argument or using CRC1 ABI with no data on `transfer` function. In this case `_data` will be empty bytes array.
